@@ -1,12 +1,6 @@
 <?php
 namespace modele\metier;
 
-/**
- * Description of Realisateur
- * un realisateur realise un ou plusieurs films
- * @author qbaudry
- */
-
 class Realisateur {
     /**
      * identifiant du realisateur

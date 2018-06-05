@@ -2,14 +2,14 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>RealisateurDAO : Test</title>
+        <title>GenreDAO : Test</title>
     </head>
 
     <body>
 
         <?php
-        use modele\metier\Realisateur;
-        use modele\dao\RealisateurDAO;
+        use modele\metier\Genre;
+        use modele\dao\GenreDAO;
         use modele\dao\Bdd;
 
         require_once __DIR__ . '/../includes/autoload.php';
@@ -19,12 +19,12 @@
         $idFilm = 1;
         Bdd::connecter();
 
-        echo "<h2>Test RealisateurDAO</h2>";
+        echo "<h2>Test GenreDAO</h2>";
 
         // Test n°1
         echo "<h3>1- Test getAll</h3>";
         try {
-            $lesObjets = RealisateurDAO::getAll();
+            $lesObjets = GenreDAO::getAll();
             echo '<h5 style="color:green">RÉUSSITE DU TEST</h5>';
             var_dump($lesObjets);
         } catch (Exception $ex) {
@@ -34,7 +34,7 @@
         // Test n°2
         echo "<h3>2- Test getOneById</h3>";
         try {
-            $objet = RealisateurDAO::getOneById($id);
+            $objet = GenreDAO::getOneById($id);
             echo '<h5 style="color:green">RÉUSSITE DU TEST</h5>';
             var_dump($objet);
         } catch (Exception $ex) {
@@ -42,9 +42,9 @@
         }
 
         // Test n°3
-        echo "<h3>3- Test getAllRealisateurByFilm</h3>";
+        echo "<h3>3- Test getAllGenreByFilm</h3>";
         try {
-            $lesObjets = RealisateurDAO::getAllRealisateurByFilm($idFilm);
+            $lesObjets = GenreDAO::getAllGenreByFilm($idFilm);
             echo '<h5 style="color:green">RÉUSSITE DU TEST</h5>';
             var_dump($lesObjets);
         } catch (Exception $ex) {
@@ -54,11 +54,11 @@
         // Test n°4A
         echo "<h3>4A- INSERT</h3>";
         try {
-            $objet = new Realisateur($idInexistant, 'baudry', 'quentin');
-            $ok = RealisateurDAO::insert($objet);
+            $objet = new Genre($idInexistant, 'libelle');
+            $ok = GenreDAO::insert($objet);
             if ($ok) {
                 echo '<h5 style="color:green">RÉUSSITE DE L\'INSERTION</h5>';
-                $objetLu = RealisateurDAO::getOneById($idInexistant);
+                $objetLu = GenreDAO::getOneById($idInexistant);
                 var_dump($objetLu);
             } else {
                 echo '<h5 style="color:red">ÉCHEC DE L\'INSERTION</h5>';
@@ -71,8 +71,8 @@
         echo "<h3>4B- INSERT - Déjà présent</h3>";
         try {
             $id = 1;
-            $objet = new Realisateur($id, 'baudry', 'quentin');
-            $ok = RealisateurDAO::insert($objet);
+            $objet = new Genre($id, 'libelle');
+            $ok = GenreDAO::insert($objet);
             if ($ok) {
                 echo '<h5 style="color:red">ÉCHEC DU TEST, l\'insertion ne devrait pas réussir  ***</h5>';
                 $objetLu = Bdd::getOneById($id);
@@ -86,15 +86,14 @@
         
         // Test n°5
         echo "<h3>5- UPDATE</h3>";
-        $objet = new Realisateur($idInexistant, 'baudry', 'quentin');
+        $objet = new Genre($idInexistant, 'libelle');
             
         try {
-            $objet->setNom('drion');
-            $objet->setPrenom('anthony');
-            $ok = RealisateurDAO::update($idInexistant, $objet);
+            $objet->setLibelle('genre');
+            $ok = GenreDAO::update($idInexistant, $objet);
             if ($ok) {
                 echo '<h5 style="color:green">RÉUSSITE DE LA MISE À JOUR</h5>';
-                $objetLu = RealisateurDAO::getOneById($idInexistant);
+                $objetLu = GenreDAO::getOneById($idInexistant);
                 var_dump($objetLu);
             } else {
                 echo '<h5 style="color:red">ÉCHEC DE LA MISE À JOUR</h5>';
@@ -106,7 +105,7 @@
         // Test n°6
         echo "<h3>6- DELETE</h3>";
         try {
-            $ok = RealisateurDAO::delete($idInexistant);
+            $ok = GenreDAO::delete($idInexistant);
             if ($ok) {
                 echo '<h5 style="color:green">RÉUSSITE DE LA SUPPRESSION</h5>';
             } else {
@@ -117,54 +116,52 @@
         }
         
         // Test n°7
-        echo "<h3>7A- isAnExistingRealisateur - Realisateur existant</h3>";
-        $nom = "baudry"; // nom existant
-        $prenom = "quentin"; // prenom existant
+        echo "<h3>7A- isAnExistingGenre - Genre existant</h3>";
+        $libelle = "action"; // nom existant
         try {
-            $ok = RealisateurDAO::isAnExistingRealisateur($nom, $prenom);
+            $ok = GenreDAO::isAnExistingGenre($libelle);
             if ($ok >= 1) {
-                echo '<h5 style="color:green">RÉUSSITE DU TEST, le realisateur existe (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:green">RÉUSSITE DU TEST, le genre existe (Nombre: '.$ok.')</h5>';
             } else {
-                echo '<h5 style="color:red">ÉCHEC DU TEST, le realisateur devrait exister (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:red">ÉCHEC DU TEST, le genre devrait exister (Nombre: '.$ok.')</h5>';
             }
         } catch (Exception $ex) {
             echo '<h5 style="color:red">ÉCHEC DE LA REQUÊTE</h5>' . $ex->getMessage();
         }
-        echo "<h3>7B- isAnExistingRealisateur - Realisateur inexistant</h3>";
-        $nom = "123"; // nom inexistant
-        $prenom = "ABC"; // prenom inexistant
+        echo "<h3>7B- isAnExistingGenre - Genre inexistant</h3>";
+        $libelle = "123"; // nom inexistant
         try {
-            $ok = RealisateurDAO::isAnExistingRealisateur($nom, $prenom);
+            $ok = GenreDAO::isAnExistingGenre($libelle);
             if ($ok >= 1) {
-                echo '<h5 style="color:red">ÉCHEC DU TEST, le realisateur ne devrait pas exister (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:red">ÉCHEC DU TEST, le genre ne devrait pas exister (Nombre: '.$ok.')</h5>';
                 echo "$ok";
             } else {
-                echo '<h5 style="color:green">RÉUSSITE DU TEST, le realisateur n\'existe pas (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:green">RÉUSSITE DU TEST, le genre n\'existe pas (Nombre: '.$ok.')</h5>';
             }
         } catch (Exception $ex) {
             echo '<h5 style="color:red">ÉCHEC DE LA REQUÊTE</h5>' . $ex->getMessage();
         }
         
         // Test n°8
-        echo "<h3>8A- isAnExistingIdInFilmRealisateur - Realisateur existant</h3>";
+        echo "<h3>8A- isAnExistingIdInFilmGenre - Genre existant</h3>";
         try {
-            $ok = RealisateurDAO::isAnExistingIdInFilmRealisateur($id);
+            $ok = GenreDAO::isAnExistingIdInFilmGenre($id);
             if ($ok >= 1) {
-                echo '<h5 style="color:green">RÉUSSITE DU TEST, le realisateur existe (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:green">RÉUSSITE DU TEST, le genre existe (Nombre: '.$ok.')</h5>';
             } else {
-                echo '<h5 style="color:red">ÉCHEC DU TEST, le realisateur devrait exister (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:red">ÉCHEC DU TEST, le genre devrait exister (Nombre: '.$ok.')</h5>';
             }
         } catch (Exception $ex) {
             echo '<h5 style="color:red">ÉCHEC DE LA REQUÊTE</h5>' . $ex->getMessage();
         }
-        echo "<h3>8B- isAnExistingIdInFilmRealisateur - Realisateur inexistant</h3>";
+        echo "<h3>8B- isAnExistingIdInFilmGenre - Genre inexistant</h3>";
         try {
-            $ok = RealisateurDAO::isAnExistingIdInFilmRealisateur($idInexistant);
+            $ok = GenreDAO::isAnExistingIdInFilmGenre($idInexistant);
             if ($ok >= 1) {
-                echo '<h5 style="color:red">ÉCHEC DU TEST, le realisateur ne devrait pas exister (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:red">ÉCHEC DU TEST, le genre ne devrait pas exister (Nombre: '.$ok.')</h5>';
                 echo "$ok";
             } else {
-                echo '<h5 style="color:green">RÉUSSITE DU TEST, le realisateur n\'existe pas (Nombre: '.$ok.')</h5>';
+                echo '<h5 style="color:green">RÉUSSITE DU TEST, le genre n\'existe pas (Nombre: '.$ok.')</h5>';
             }
         } catch (Exception $ex) {
             echo '<h5 style="color:red">ÉCHEC DE LA REQUÊTE</h5>' . $ex->getMessage();

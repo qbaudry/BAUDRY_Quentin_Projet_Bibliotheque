@@ -1,52 +1,50 @@
 <?php
 namespace modele\dao;
 
-use modele\metier\Realisateur;
+use modele\metier\Genre;
 use PDOStatement;
 use PDO;
 
-class RealisateurDAO {
+class GenreDAO {
 
     /**
-     * Instancier un objet de la classe Realisateur à partir d'un enregistrement de la table REALISATEUR
+     * Instancier un objet de la classe Genre à partir d'un enregistrement de la table GENRE
      * @param array $enreg
-     * @return Realisateur
+     * @return Genre
      */
     protected static function enregVersMetier(array $enreg) {
         $id = $enreg['ID'];
-        $nom = $enreg['NOM'];
-        $prenom = $enreg['PRENOM'];
+        $libelle = $enreg['LIBELLE'];
         
-        $unRealisateur = new Realisateur($id, $nom, $prenom);
+        $unGenre = new Genre($id, $libelle);
 
-        return $unRealisateur;
+        return $unGenre;
     }
     
     /**
      * Complète une requête préparée
      * les paramètres de la requête associés aux valeurs des attributs d'un objet métier
-     * @param Realisateur $objetMetier
+     * @param Genre $objetMetier
      * @param PDOStatement $stmt
      */
-    protected static function metierVersEnreg(Realisateur $objetMetier, PDOStatement $stmt) {
+    protected static function metierVersEnreg(Genre $objetMetier, PDOStatement $stmt) {
         $stmt->bindValue(':id', $objetMetier->getId());
-        $stmt->bindValue(':nom', $objetMetier->getNom());
-        $stmt->bindValue(':prenom', $objetMetier->getPrenom());
+        $stmt->bindValue(':libelle', $objetMetier->getLibelle());
     }
 
     /**
-     * Retourne la liste de tous les realisateurs
-     * @return array tableau d'objets de type Realisateur
+     * Retourne la liste de tous les genres
+     * @return array tableau d'objets de type Genre
      */
     public static function getAll() {
         $lesObjets = array();
-        $requete = "SELECT * FROM realisateur";
+        $requete = "SELECT * FROM genre";
         $stmt = Bdd::getPdo()->prepare($requete);
         $ok = $stmt->execute();
         if ($ok) {
             // Tant qu'il y a des enregistrements dans la table
             while ($enreg = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                //ajoute un nouveau realisateur au tableau
+                //ajoute un nouveau genre au tableau
                 $lesObjets[] = self::enregVersMetier($enreg);
             }
         }
@@ -54,13 +52,13 @@ class RealisateurDAO {
     }
 
     /**
-     * Recherche un realisateur selon la valeur de son identifiant
+     * Recherche un genre selon la valeur de son identifiant
      * @param int $id
-     * @return Realisateur le realisateur trouvé ; null sinon
+     * @return Genre le genre trouvé ; null sinon
      */
     public static function getOneById($id) {
         $objetConstruit = null;
-        $requete = "SELECT * FROM realisateur WHERE ID = :id";
+        $requete = "SELECT * FROM genre WHERE ID = :id";
         $stmt = Bdd::getPdo()->prepare($requete);
         $stmt->bindParam(':id', $id);
         $ok = $stmt->execute();
@@ -72,16 +70,16 @@ class RealisateurDAO {
     }
 
     /**
-     * Retourne la liste des realisateurs attribués à un film donné
+     * Retourne la liste des genres attribués à un film donné
      * @param int $idFilm
-     * @return array tableau d'éléments de type Realisateur
+     * @return array tableau d'éléments de type Genre
      */
-    public static function getAllRealisateurByFilm($idFilm) {
-        $lesRealisateurs = array();  // le tableau à retourner
-        $requete = "SELECT * FROM realisateur
+    public static function getAllGenreByFilm($idFilm) {
+        $lesGenres = array();  // le tableau à retourner
+        $requete = "SELECT * FROM genre
                     WHERE ID IN (
-                    SELECT DISTINCT ID FROM realisateur r
-                            INNER JOIN film_realisateur fr ON r.ID = fr.IDRealisateur
+                    SELECT DISTINCT ID FROM genre g
+                            INNER JOIN film_genre fg ON g.ID = fg.IDGenre
                             WHERE IDFilm = :id
                     )";
         $stmt = Bdd::getPdo()->prepare($requete);
@@ -90,20 +88,20 @@ class RealisateurDAO {
         if ($ok) {
             // Tant qu'il y a des enregistrements dans la table
             while ($enreg = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                //ajoute un nouveau realisateur au tableau
-                $lesRealisateurs[] = self::enregVersMetier($enreg);
+                //ajoute un nouveau genre au tableau
+                $lesGenres[] = self::enregVersMetier($enreg);
             }
         } 
-        return $lesRealisateurs;
+        return $lesGenres;
     }
     
     /**
      * Insérer un nouvel enregistrement dans la table à partir de l'état d'un objet métier
-     * @param Realisateur $objet objet métier à insérer
+     * @param Genre $objet objet métier à insérer
      * @return boolean =FALSE si l'opération échoue
      */
-    public static function insert(Realisateur $objet) {
-        $requete = "INSERT INTO realisateur VALUES (:id, :nom, :prenom)";
+    public static function insert(Genre $objet) {
+        $requete = "INSERT INTO genre VALUES (:id, :libelle)";
         $stmt = Bdd::getPdo()->prepare($requete);
         self::metierVersEnreg($objet, $stmt);
         $ok = $stmt->execute();
@@ -113,11 +111,11 @@ class RealisateurDAO {
     /**
      * Mettre à jour enregistrement dans la table à partir de l'état d'un objet métier
      * @param int identifiant de l'enregistrement à mettre à jour
-     * @param Realisateur $objet objet métier à mettre à jour
+     * @param Genre $objet objet métier à mettre à jour
      * @return boolean =FALSE si l'opérationn échoue
      */
-    public static function update($id, Realisateur $objet) {
-        $requete = "UPDATE realisateur SET Nom = :nom, Prenom = :prenom WHERE ID = :id";
+    public static function update($id, Genre $objet) {
+        $requete = "UPDATE genre SET Libelle = :libelle WHERE ID = :id";
         $stmt = Bdd::getPdo()->prepare($requete);
         self::metierVersEnreg($objet, $stmt);
         $stmt->bindParam(':id', $id);
@@ -127,13 +125,13 @@ class RealisateurDAO {
     }
     
     /**
-     * Détruire un enregistrement de la table REALISATEUR d'après son identifiant
+     * Détruire un enregistrement de la table GENRE d'après son identifiant
      * @param int identifiant de l'enregistrement à détruire
      * @return boolean =TRUE si l'enregistrement est détruit, =FALSE si l'opération échoue
      */
     public static function delete($id) {
         $ok = false;
-        $requete = "DELETE FROM realisateur WHERE ID = :id";
+        $requete = "DELETE FROM genre WHERE ID = :id";
         $stmt = Bdd::getPdo()->prepare($requete);
         $stmt->bindParam(':id', $id);
         $ok = $stmt->execute();
@@ -142,27 +140,25 @@ class RealisateurDAO {
     }
 
     /**
-     * Recherche si le realisateur proposé existe déjà dans la base de données
-     * @param string $nom
-     * @param string $prenom
-     * @return int le nombre de realisateurs déjà existant dans la BD (0 ou 1) ; c'est donc aussi un booléen
+     * Recherche si le genre proposé existe déjà dans la base de données
+     * @param string $libelle
+     * @return int le nombre de genres déjà existant dans la BD (0 ou 1) ; c'est donc aussi un booléen
      */
-    public static function isAnExistingRealisateur($nom, $prenom) {
-        $requete = "SELECT COUNT(*) FROM realisateur WHERE Nom LIKE :nom AND Prenom LIKE :prenom";
+    public static function isAnExistingGenre($libelle) {
+        $requete = "SELECT COUNT(*) FROM genre WHERE Libelle LIKE :libelle";
         $stmt = Bdd::getPdo()->prepare($requete);
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':prenom', $prenom);
+        $stmt->bindParam(':libelle', $libelle);
         $stmt->execute();
         return $stmt->fetchColumn(0);
     }
     
     /**
-     * Recherche un identifiant de realisateur existant dans FILM_REALISATEUR
-     * @param int $id du realisateur recherché
-     * @return int le nombre de realisateurs correspondant à cet id (0 ou 1)
+     * Recherche un identifiant de genre existant dans FILM_GENRE
+     * @param int $id du genre recherché
+     * @return int le nombre de genres correspondant à cet id (0 ou 1)
      */
-    public static function isAnExistingIdInFilmRealisateur($id) {
-        $requete = "SELECT COUNT(*) FROM film_realisateur WHERE IDRealisateur = :id";
+    public static function isAnExistingIdInFilmGenre($id) {
+        $requete = "SELECT COUNT(*) FROM film_genre WHERE IDGenre = :id";
         $stmt = Bdd::getPdo()->prepare($requete);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
